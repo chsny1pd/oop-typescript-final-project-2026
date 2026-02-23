@@ -7,7 +7,8 @@ export interface Post {
   title: string;
   content: string;
   status: PostStatus;
-  createdAt: Date;
+  createdAt: string;
+  likes: number;
 }
 
 // export interface Post {
