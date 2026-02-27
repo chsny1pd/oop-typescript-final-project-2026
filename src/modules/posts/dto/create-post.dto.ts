@@ -7,6 +7,12 @@ export class CreatePostDto {
   @IsEnum(PostStatus) status!: PostStatus;
 }
 
+export class UpdatePostDto {
+  @IsString() @IsNotEmpty() title!: string;
+  @IsString() @IsNotEmpty() content!: string;
+  @IsEnum(PostStatus) status!: PostStatus;
+}
+
 // import { IsString, IsNotEmpty, MinLength } from 'class-validator';
 
 // export class CreatePostDto {

@@ -1,6 +1,6 @@
-import { Controller, Get, Post, Body, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Put } from '@nestjs/common'; // ✅ เพิ่ม Put
 import { CommentsService } from './comments.service';
-import { CreateCommentDto } from './dto/create-comment.dto';
+import { CreateCommentDto, UpdateCommentDto } from './dto/create-comment.dto';
 import { ApiResponse } from '../../common/interfaces/api-response.interface';
 import { Comment } from './interfaces/comment.interface';
 
@@ -23,6 +23,18 @@ export class CommentsController {
       success: true,
       message: 'ดึงข้อมูลความคิดเห็นสำเร็จ',
       data: this.commentsService.findByPostId(postId),
+    };
+  }
+
+  @Put(':id')
+  update(
+    @Param('id') id: string,
+    @Body() dto: UpdateCommentDto,
+  ): ApiResponse<Comment> {
+    return {
+      success: true,
+      message: 'อัปเดตความคิดเห็นสำเร็จ',
+      data: this.commentsService.update(id, dto),
     };
   }
 

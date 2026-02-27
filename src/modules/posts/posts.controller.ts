@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Delete, Param, Patch } from '@nestjs/common';
+import { Controller, Get, Post,Put, Body, Delete, Param, Patch } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { ApiResponse } from '../../common/interfaces/api-response.interface';
@@ -25,6 +25,12 @@ export class PostsController {
   create(@Body() dto: CreatePostDto): ApiResponse<PostEntity> {
     return { success: true, message: 'Created', data: this.postsService.create(dto) };
   }
+
+  @Put(':id')
+  replace(@Param('id') id: string, @Body() dto: UpdatePostDto): ApiResponse<PostEntity> {
+    return { success: true, message: 'อัปเดตโพสต์สำเร็จ', data: this.postsService.replace(id, dto) };
+  }
+
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() dto: Partial<CreatePostDto>): ApiResponse<PostEntity> {

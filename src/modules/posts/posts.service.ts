@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Post } from './interfaces/post.interface'; //
-import { CreatePostDto } from './dto/create-post.dto'; //
-import { formatDate } from '../../common/utils/date.util'; //
+import { Post } from './interfaces/post.interface';
+import { CreatePostDto, UpdatePostDto } from './dto/create-post.dto'; 
+import { formatDate } from '../../common/utils/date.util'; 
 
 @Injectable()
 export class PostsService {
@@ -31,6 +31,21 @@ export class PostsService {
     return newPost; //
   }
 
+  replace(id: string, dto: UpdatePostDto): Post {
+    const index = this.posts.findIndex(p => p.id === id);
+    if (index === -1) throw new NotFoundException('Post not found');
+
+    // แทนที่ข้อมูลทั้งหมด แต่คง id, createdAt, likes ไว้
+    this.posts[index] = {
+      ...this.posts[index],
+      title: dto.title,
+      content: dto.content,
+      status: dto.status,
+    };
+    return this.posts[index];
+  }
+
+  
   // void หมายถึงฟังก์ชันนี้ทำงานเสร็จแล้วไม่ต้องส่งค่าอะไรกลับ (เพราะลบไปแล้ว)
   remove(id: string): void {
     const index = this.posts.findIndex(p => p.id === id); //
