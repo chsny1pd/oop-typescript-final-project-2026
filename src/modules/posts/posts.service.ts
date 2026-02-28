@@ -1,67 +1,67 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, InternalServerErrorException } from '@nestjs/common';
 import { Post } from './interfaces/post.interface';
 import { CreatePostDto, UpdatePostDto } from './dto/create-post.dto'; 
 import { formatDate } from '../../common/utils/date.util'; 
 
 @Injectable()
 export class PostsService {
-  private posts: Post[] = []; //
+  private posts: Post[] = [];
 
-  // ระบุชัดเจนว่าคืนค่าเป็น Array ของ Post
   findAll(): Post[] { 
-    return this.posts; //
+    return this.posts; 
   }
   
-  // ระบุชัดเจนว่าคืนค่าเป็น Post 1 อัน
   findOne(id: string): Post {
-    const post = this.posts.find(p => p.id === id); //
-    if (!post) throw new NotFoundException('Post not found'); //
-    return post; //
+    const post = this.posts.find(p => p.id === id);
+    // ใช้ 404 เมื่อหาไอดีไม่เจอ
+    if (!post) throw new NotFoundException(`ไม่พบโพสต์ไอดี: ${id}`); 
+    return post; 
   }
 
   create(dto: CreatePostDto): Post {
-    // พ่อครัวปรุงอาหารตามใบสั่ง (dto) แล้วเติม ID กับวันที่
-    const newPost: Post = { 
-      id: Date.now().toString(), 
-      ...dto, 
-      createdAt: formatDate(new Date()), 
-      likes: 0 
-    }; 
-    this.posts.push(newPost); //
-    return newPost; //
+    try {
+      const newPost: Post = { 
+        id: Date.now().toString(), 
+        ...dto, 
+        createdAt: formatDate(new Date()), 
+        likes: 0 
+      }; 
+      this.posts.push(newPost);
+      return newPost;
+    } catch (error) {
+      // ป้องกัน Error 500 จาก Logic ภายใน
+      throw new InternalServerErrorException('เกิดข้อผิดพลาดในการสร้างโพสต์');
+    }
   }
 
   replace(id: string, dto: UpdatePostDto): Post {
     const index = this.posts.findIndex(p => p.id === id);
-    if (index === -1) throw new NotFoundException('Post not found');
+    if (index === -1) throw new NotFoundException('ไม่พบโพสต์ที่ต้องการอัปเดต');
 
-    // แทนที่ข้อมูลทั้งหมด แต่คง id, createdAt, likes ไว้
     this.posts[index] = {
       ...this.posts[index],
-      title: dto.title,
-      content: dto.content,
-      status: dto.status,
+      title: dto.title ?? this.posts[index].title,
+      content: dto.content ?? this.posts[index].content,
+      status: dto.status ?? this.posts[index].status,
     };
     return this.posts[index];
   }
 
-  
-  // void หมายถึงฟังก์ชันนี้ทำงานเสร็จแล้วไม่ต้องส่งค่าอะไรกลับ (เพราะลบไปแล้ว)
   remove(id: string): void {
-    const index = this.posts.findIndex(p => p.id === id); //
-    if (index === -1) throw new NotFoundException('Post not found'); //
-    this.posts.splice(index, 1); //
+    const index = this.posts.findIndex(p => p.id === id);
+    if (index === -1) throw new NotFoundException('ไม่พบโพสต์ที่ต้องการลบ');
+    this.posts.splice(index, 1);
   }
   
-  update(id: string, dto: Partial<CreatePostDto>): Post {
-    const post = this.findOne(id); // ใช้ฟังก์ชัน findOne ที่เราเขียนไว้มาช่วยหา
-    Object.assign(post, dto); // นำข้อมูลใหม่ใน dto ไปทับข้อมูลเดิม
-    return post; //
+  update(id: string, dto: UpdatePostDto): Post {
+    const post = this.findOne(id);
+    Object.assign(post, dto);
+    return post;
   }
 
   likePost(id: string): number {
-    const post = this.findOne(id); //
-    post.likes = (post.likes || 0) + 1; // เพิ่มจำนวนไลก์
-    return post.likes; // ส่งแค่ตัวเลขจำนวนไลก์กลับไป
+    const post = this.findOne(id);
+    post.likes = (post.likes || 0) + 1;
+    return post.likes;
   }
 }

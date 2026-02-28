@@ -41,7 +41,14 @@ import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
+  
+  // ปรับปรุง Pipe ให้ดักจับละเอียดขึ้น
+  app.useGlobalPipes(new ValidationPipe({
+    whitelist: true,            // ตัดข้อมูลที่ไม่อยู่ใน DTO ทิ้ง
+    transform: true,            // แปลงประเภทข้อมูลอัตโนมัติ
+    forbidNonWhitelisted: true, // ถ้าส่งตัวแปรเกินมา ให้ Error 400 ทันที
+  }));
+
   await app.listen(3000);
 }
 bootstrap();
