@@ -1,19 +1,17 @@
-// import { Module } from '@nestjs/common';
-
-// @Module({
-//   imports: [],
-//   controllers: [],
-//   providers: [],
-// })
-// export class AppModule {}
 import { Module } from '@nestjs/common';
-import { PostsController } from './modules/posts/posts.controller';
-import { PostsService } from './modules/posts/posts.service';
-import { CommentsController } from './modules/comments/comments.controller';
-import { CommentsService } from './modules/comments/comments.service';
+import { AuthModule } from './modules/auth/auth.module';
+import { PostsModule } from './modules/posts/posts.module';
+import { CommentsModule } from './modules/comments/comments.module';
+import { LikesModule } from './modules/likes/likes.module';
+import { UsersModule } from './modules/users/users.module';
 
 @Module({
-  controllers: [PostsController, CommentsController],
-  providers: [PostsService, CommentsService],
+  imports: [
+    AuthModule,
+    UsersModule,
+    PostsModule,
+    CommentsModule,
+    LikesModule,
+  ],
 })
 export class AppModule {}

@@ -1,50 +1,73 @@
-import { Controller, Get, Post, Body, Param, Delete, Put } from '@nestjs/common'; // ✅ เพิ่ม Put
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  Patch
+} from '@nestjs/common';
+
 import { CommentsService } from './comments.service';
-import { CreateCommentDto, UpdateCommentDto } from './dto/create-comment.dto';
-import { ApiResponse } from '../../common/interfaces/api-response.interface';
-import { Comment } from './interfaces/comment.interface';
+import {
+  CreateCommentDto,
+  UpdateCommentDto
+} from './dto/comment.dto';
+
+/**
+ * Controller สำหรับ API comments
+ */
 
 @Controller('comments')
 export class CommentsController {
-  constructor(private readonly commentsService: CommentsService) {}
 
-  @Post()
-  create(@Body() dto: CreateCommentDto): ApiResponse<Comment> {
-    return {
-      success: true,
-      message: 'เพิ่มความคิดเห็นสำเร็จ',
-      data: this.commentsService.create(dto),
-    };
-  }
+  constructor(
+    private readonly commentsService: CommentsService
+  ) {}
 
+  /**
+   * GET comments ของ post
+   *
+   * GET /comments/post/:postId
+   */
   @Get('post/:postId')
-  getByPost(@Param('postId') postId: string): ApiResponse<Comment[]> {
-    return {
-      success: true,
-      message: 'ดึงข้อมูลความคิดเห็นสำเร็จ',
-      data: this.commentsService.findByPostId(postId),
-    };
+  findByPost(@Param('postId') postId: string) {
+
+    return this.commentsService.findByPostId(postId);
+
   }
 
-  @Put(':id')
+  /**
+   * POST สร้าง comment
+   */
+  @Post()
+  create(@Body() dto: CreateCommentDto) {
+
+    return this.commentsService.create(dto);
+
+  }
+
+  /**
+   * PATCH แก้ comment
+   */
+  @Patch(':id')
   update(
     @Param('id') id: string,
-    @Body() dto: UpdateCommentDto,
-  ): ApiResponse<Comment> {
-    return {
-      success: true,
-      message: 'อัปเดตความคิดเห็นสำเร็จ',
-      data: this.commentsService.update(id, dto),
-    };
+    @Body() dto: UpdateCommentDto
+  ) {
+
+    return this.commentsService.update(id, dto);
+
   }
 
+  /**
+   * DELETE comment
+   */
   @Delete(':id')
-  remove(@Param('id') id: string): ApiResponse<null> {
-    this.commentsService.remove(id);
-    return {
-      success: true,
-      message: 'ลบความคิดเห็นสำเร็จ',
-      data: null,
-    };
+  remove(@Param('id') id: string) {
+
+    return this.commentsService.remove(id);
+
   }
+
 }

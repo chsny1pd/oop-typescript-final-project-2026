@@ -1,15 +1,7 @@
 export interface Comment {
   id: string;
-  postId: string; // เชื่อมกับ Post
+  postId: string; 
   message: string;
   author: string;
-  createdAt: Date;
+  createdAt: string;
 }
-
-// export interface Comment {
-//   id: string;
-//   postId: string;
-//   author: string;
-//   content: string;
-//   createdAt: Date;
-// }

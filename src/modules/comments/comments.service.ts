@@ -1,64 +1,81 @@
-import { Injectable, NotFoundException, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Comment } from './interfaces/comment.interface';
-import { CreateCommentDto, UpdateCommentDto } from './dto/create-comment.dto';
+import { CreateCommentDto, UpdateCommentDto } from './dto/comment.dto';
+import { formatDate } from '../../common/utils/date.util';
 
+/**
+ * Service ใช้จัดการ logic ของ comment
+ */
 @Injectable()
 export class CommentsService {
-  private comments: Comment[] = []; // เก็บข้อมูลใน Memory ตามโค้ดเดิมของคุณ
 
-  // 1. ดึงความคิดเห็นตาม postId
+  /**
+   * mock database (array)
+   */
+  private comments: Comment[] = [];
+
+  /**
+   * ดึง comment ของ post
+   */
   findByPostId(postId: string): Comment[] {
-    return this.comments.filter((c) => c.postId === postId); //
+
+    return this.comments.filter(
+      (comment) => comment.postId === postId
+    );
+
   }
 
-  // 2. สร้างความคิดเห็นใหม่ (เพิ่ม Try-Catch ป้องกัน Error 500)
+  /**
+   * สร้าง comment
+   */
   create(dto: CreateCommentDto): Comment {
-    try {
-      const newComment: Comment = {
-        id: Date.now().toString(), // ใช้ Timestamp เป็น ID
-        ...dto,
-        createdAt: new Date(), //
-      };
-      this.comments.push(newComment);
-      return newComment;
-    } catch (error) {
-      // หากเกิดเหตุไม่คาดฝัน ให้พ่น 500 แบบระบุข้อความเอง แทนการปล่อยให้ระบบล่ม
-      throw new InternalServerErrorException('ไม่สามารถบันทึกความคิดเห็นได้ในขณะนี้');
-    }
+
+    const comment: Comment = {
+      id: Date.now().toString(),
+      ...dto,
+      createdAt: formatDate(new Date())
+    };
+
+    this.comments.push(comment);
+
+    return comment;
   }
 
-  // 3. อัปเดตความคิดเห็น (เพิ่มการเช็ก 404 และ Try-Catch)
+  /**
+   * แก้ไข comment
+   */
   update(id: string, dto: UpdateCommentDto): Comment {
-    const index = this.comments.findIndex((c) => c.id === id);
-    
-    // หากไม่พบ ID ให้ส่ง HTTP 404 Not Found ทันที
+
+    const index = this.comments.findIndex(
+      c => c.id === id
+    );
+
     if (index === -1) {
-      throw new NotFoundException(`ไม่พบความคิดเห็นที่ต้องการแก้ไข (ID: ${id})`);
+      throw new NotFoundException('Comment not found');
     }
 
-    try {
-      this.comments[index] = { 
-        ...this.comments[index], 
-        ...dto 
-      }; //
-      return this.comments[index];
-    } catch (error) {
-      throw new InternalServerErrorException('เกิดข้อผิดพลาดในการอัปเดตข้อมูล');
-    }
+    this.comments[index] = {
+      ...this.comments[index],
+      ...dto
+    };
+
+    return this.comments[index];
   }
 
-  // 4. ลบความคิดเห็น (เพิ่มการเช็ก 404)
-  remove(id: string): void {
-    const index = this.comments.findIndex((c) => c.id === id);
-    
+  /**
+   * ลบ comment
+   */
+  remove(id: string) {
+
+    const index = this.comments.findIndex(
+      c => c.id === id
+    );
+
     if (index === -1) {
-      throw new NotFoundException('ไม่สามารถลบได้เนื่องจากไม่พบความคิดเห็นดังกล่าว'); //
+      throw new NotFoundException('Comment not found');
     }
 
-    try {
-      this.comments.splice(index, 1); //
-    } catch (error) {
-      throw new InternalServerErrorException('ระบบเกิดข้อผิดพลาดในการลบข้อมูล');
-    }
+    this.comments.splice(index, 1);
   }
+
 }
