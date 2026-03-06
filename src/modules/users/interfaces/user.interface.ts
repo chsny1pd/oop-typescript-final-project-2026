@@ -1,11 +1,6 @@
 export interface User {
-
-  id: string;
-
-  username: string;
-
-  password: string;
-
-  createdAt: string;
-
+  id: number;          // id ของ user
+  username: string;    // username
+  password: string;    // password
+  createdAt: string;   // วันที่สร้าง
 }

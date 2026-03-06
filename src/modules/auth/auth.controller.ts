@@ -1,29 +1,39 @@
 import { Controller, Post, Body } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { LoginDto } from './dto/auth.dto';
+
+import { LoginDto } from './dto/login.dto';
+import { RegisterDto } from './dto/register.dto';
 
 /**
- * Controller สำหรับจัดการ API authentication
+ * Controller สำหรับ API authentication
  */
 @Controller('auth')
 export class AuthController {
 
-  /**
-   * inject AuthService
-   */
   constructor(
     private readonly authService: AuthService
   ) {}
 
   /**
+   * POST /auth/register
+   * สมัคร user ใหม่
+   */
+  @Post('register')
+  register(
+    @Body() dto: RegisterDto
+  ) {
+    return this.authService.register(dto);
+  }
+
+  /**
    * POST /auth/login
-   * ใช้สำหรับ login
+   * login
    */
   @Post('login')
-  login(@Body() dto: LoginDto) {
-
+  login(
+    @Body() dto: LoginDto
+  ) {
     return this.authService.login(dto);
-
   }
 
 }

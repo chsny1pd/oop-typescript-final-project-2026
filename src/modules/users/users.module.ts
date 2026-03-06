@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common';
+import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 
 /**
- * Module สำหรับจัดการ users
+ * Module สำหรับ user
  */
-
 @Module({
+  controllers: [UsersController],
   providers: [UsersService],
-  exports: [UsersService], 
-  // export เพื่อให้ module อื่นเรียกใช้ service ได้ เช่น auth
+  exports: [UsersService]
 })
 export class UsersModule {}
