@@ -1,7 +1,8 @@
-import { Injectable, NotFoundException, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, NotFoundException, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
 import { Comment } from './interfaces/comment.interface';
 import { CreateCommentDto, UpdateCommentDto } from './dto/comment.dto';
-import { PostsService } from '../posts/posts.service'
+import { PostsService } from '../posts/posts.service';
+import { UsersService } from '../users/users.service';
 import { formatDate } from '../../common/utils/date.util';
 
 /**
@@ -15,8 +16,10 @@ export class CommentsService {
    */
   private comments: Comment[] = [];
 
-  // แก้ไข Constructor เพื่อเรียกใช้ PostsService
-  constructor(private readonly postsService: PostsService) {}
+  constructor(
+    private readonly postsService: PostsService,
+    private readonly usersService: UsersService,
+  ) {}
 
   /**
    * ดึง comment ของ post
@@ -33,9 +36,17 @@ export class CommentsService {
    * สร้าง comment
    */
   create(dto: CreateCommentDto): Comment {
-    // 1. ตรวจสอบก่อนว่า postId ที่ส่งมา มีโพสต์นั้นอยู่จริงไหม
+
+    // 1. ตรวจสอบว่า author มีชื่อผู้ใช้นี้อยู่ในระบบจริงไหม
+    // ถ้าไม่เจอ จะ throw 401 Unauthorized ทันที
+    const user = this.usersService.findByUsername(dto.author);
+    if (!user) {
+      throw new UnauthorizedException('Only registered users can comment. Please register first.');
+    }
+
+    // 2. ตรวจสอบก่อนว่า postId ที่ส่งมา มีโพสต์นั้นอยู่จริงไหม
     // ถ้าไม่เจอ เมธอด findOne ใน PostsService จะ throw NotFoundException (404) ทันที
-    this.postsService.findOne(dto.postId); 
+    this.postsService.findOne(dto.postId);
 
     try {
       const comment: Comment = {
@@ -47,7 +58,7 @@ export class CommentsService {
       this.comments.push(comment);
       return comment;
     } catch (error) {
-      // 2. ป้องกัน Error 500 ดิบๆ ตามเกณฑ์คะแนน
+      // 3. ป้องกัน Error 500 ดิบๆ ตามเกณฑ์คะแนน
       throw new InternalServerErrorException('ไม่สามารถบันทึกความคิดเห็นได้ในขณะนี้');
     }
   }

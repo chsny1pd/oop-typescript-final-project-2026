@@ -27,7 +27,7 @@ export class PostsController {
     return this.postsService.update(id, dto);
   }
 
-@Put(':id')
+  @Put(':id')
   replace(@Param('id') id: string, @Body() dto: UpdatePostDto) {
     return this.postsService.update(id, dto);
   }

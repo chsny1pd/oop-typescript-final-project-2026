@@ -37,7 +37,6 @@ export class PostsService {
     const post: Post = {
       id: Date.now().toString(),
       ...dto,
-      likes: 0,
       createdAt: formatDate(new Date())
     }
 

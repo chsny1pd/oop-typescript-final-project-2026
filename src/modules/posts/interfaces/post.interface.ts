@@ -9,5 +9,4 @@ export interface Post {
   content: string;
   status: PostStatus;
   createdAt: string;
-  likes: number;
 }

@@ -26,8 +26,4 @@ export class UpdateCommentDto {
   @IsString()
   @IsOptional()
   message?: string;
-
-  @IsString()
-  @IsOptional()
-  author?: string;
 }
