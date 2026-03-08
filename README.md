@@ -1,60 +1,176 @@
-# NestJS Backend API — Project Template
+# 📝 Blog API
 
-## 📌 Project Overview
-
-โปรเจคนี้เป็น **Template สำหรับ Class Project** ในรายวิชาการพัฒนา Backend ด้วย NestJS Framework
-
-**Repository:** [https://github.com/42bangkok-classroom/oop-typescript-final-project-2026](https://github.com/42bangkok-classroom/oop-typescript-final-project-2026)
-
-วัตถุประสงค์ของโปรเจคนี้คือให้นักศึกษาฝึก:
-
-* การออกแบบและพัฒนา REST API ตามมาตรฐาน
-* การใช้ TypeScript อย่างปลอดภัย (Type-safe)
-* การจัดการ Validation และ Error Handling
-* การจัดทำเอกสารระบบ (Documentation)
+A RESTful API for a blog platform built with **NestJS** and **TypeScript**.  
+Supports user authentication, post management, and a comment system — with clean structured responses and full Swagger documentation.
 
 ---
 
-## 👥 Team Structure
+## 📑 Table of Contents
 
-* ทำงานเป็นกลุ่ม กลุ่มละ **3–4 คน**
-* ระยะเวลาการพัฒนา **ประมาณ 2 สัปดาห์**
-* สมาชิกทุกคนต้องมี commit ใน repository
-* รายชื่อสมาชิกต้องถูกระบุไว้ใน `package.json` (key `contributors`)
+- [Project Overview](#-project-overview)
+- [Technology Stack](#-technology-stack)
+- [Installation & Setup](#-installation--setup)
+- [Project Structure](#-project-structure)
+- [Documentation](#-documentation)
+
+---
+
+## 🌐 Project Overview
+
+Blog API is a backend REST API that provides the following core features:
+
+| Feature | Description |
+|---|---|
+| 🔐 **Authentication** | Register and login with username/password |
+| 👤 **User Management** | Full CRUD for user accounts |
+| 📝 **Post Management** | Create, read, update, and delete blog posts with `draft` / `published` status |
+| 💬 **Comments** | Registered users can comment on posts; only valid usernames are accepted |
+
+**Key behaviours:**
+- All responses follow a unified envelope format `{ success, data }`
+- All errors are caught globally and return a consistent `{ success, message, path }` format
+- Input validation is enforced on every endpoint via `class-validator`
+- Data is stored **in-memory** — no external database required
 
 ---
 
 ## 🛠 Technology Stack
 
-* **Framework:** NestJS
-* **Language:** TypeScript
-* **API Style:** REST API
-* **Database:** JSON-based (file-based หรือ in-memory)
-* **API Documentation:** Swagger (OpenAPI)
-* **Linting:** ESLint (TypeScript ESLint)
+| Layer | Technology |
+|---|---|
+| **Runtime** | Node.js |
+| **Language** | TypeScript |
+| **Framework** | NestJS |
+| **Validation** | class-validator · class-transformer |
+| **API Docs** | Swagger (via `@nestjs/swagger`) |
+| **Storage** | In-memory (mock arrays — no database) |
+
+---
+
+## ⚙️ Installation & Setup
+
+### Prerequisites
+
+Make sure you have the following installed:
+
+- [Node.js](https://nodejs.org/) v18 or higher
+- npm v9 or higher
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/your-username/blog-api.git
+cd blog-api
+```
+
+### 2. Install dependencies
+
+```bash
+npm install
+```
+
+### 3. Start the development server
+
+```bash
+npm run start:dev
+```
+
+The server will start at:
+
+```
+http://localhost:3000
+```
+
+### 4. Open Swagger UI
+
+Once the server is running, open your browser and navigate to:
+
+```
+http://localhost:3000/api
+```
+
+You'll see the full interactive API documentation where you can test every endpoint directly.
+
+### Other useful commands
+
+```bash
+# Build for production
+npm run build
+
+# Run in production mode
+npm run start:prod
+
+# Run tests
+npm run test
+```
+
+> ⚠️ **Note:** All data is stored in-memory. Restarting the server will reset all data.
 
 ---
 
 ## 📁 Project Structure
 
-```text
-.
+```
 ├── src/
-│   ├── main.ts
-│   ├── app.module.ts
+│   ├── app.module.ts                        # Root module
+│   ├── main.ts                              # App entry point
 │   │
-│   ├── modules/
-│   │   └── example/
-│   │       └── dto/
+│   ├── config/
+│   │     └── swagger.config.ts              # Swagger setup
 │   │
-│   └── common/
-│       ├── interfaces/
-│       └── utils/
+│   ├── common/
+│   │   ├── filters/
+│   │   │   └── http-exception.filter.ts     # Global error handler
+│   │   ├── interceptors/
+│   │   │   └── response.interceptor.ts      # Global response formatter
+│   │   ├── interfaces/
+│   │   │   └── api-response.interface.ts    # ApiResponse<T> type
+│   │   └── utils/
+│   │       └── date.util.ts                 # Thai-locale date formatter
+│   │
+│   └── modules/
+│         ├── auth/
+│         │    ├── auth.module.ts
+│         │    ├── auth.controller.ts        # POST /auth/register, /auth/login
+│         │    ├── auth.service.ts
+│         │    └── dto/
+│         │         ├── register.dto.ts
+│         │         └── login.dto.ts
+│         │
+│         ├── users/
+│         │    ├── users.module.ts
+│         │    ├── users.controller.ts       # GET|POST|PATCH|DELETE /users
+│         │    ├── users.service.ts
+│         │    ├── interfaces/
+│         │    │    └── user.interface.ts
+│         │    └── dto/
+│         │         ├── create-user.dto.ts
+│         │         ├── update-user.dto.ts
+│         │         └── user-response.dto.ts
+│         │
+│         ├── posts/
+│         │    ├── posts.module.ts
+│         │    ├── posts.controller.ts       # GET|POST|PUT|PATCH|DELETE /posts
+│         │    ├── posts.service.ts
+│         │    ├── interfaces/
+│         │    │    └── post.interface.ts
+│         │    └── dto/
+│         │         └── post.dto.ts
+│         │
+│         └── comments/
+│              ├── comments.module.ts
+│              ├── comments.controller.ts    # GET|POST|PUT|PATCH|DELETE /comments
+│              ├── comments.service.ts
+│              ├── interfaces/
+│              │    └── comment.interface.ts
+│              └── dto/
+│                   └── comment.dto.ts
 │
 ├── docs/
 │   ├── api-specification.md
 │   ├── data-model.md
 │   └── uml-diagram.png
+│
 ├── subjects/
 │   ├── requirement.md
 │   ├── submission.md
@@ -66,178 +182,47 @@
 └── README.md
 ```
 
-> 📌 หมายเหตุ: 
-> * โครงสร้างอาจมีการปรับเพิ่มเติมได้ตามความเหมาะสม แต่ต้องยังคงความเป็นระเบียบและอ่านง่าย
-> * **แนะนำให้แยก module ตาม models** (เช่น `modules/users/`, `modules/products/`) เพื่อให้โค้ดเป็นระบบและดูแลรักษาง่าย
-> * แต่ละ module ควรมี controller, service, และ dto ของตัวเอง
+---
+
+## 📚 Documentation
+
+Detailed documentation is available in the [`docs/`](./docs) folder:
+
+| Document | Description |
+|---|---|
+| 📘 [API Specification](./docs/api-specification.md) | Every endpoint — method, path, request body, response examples, and error codes |
+| 🗂️ [Data Model](./docs/data-model.md) | All entities, DTOs, enums, relationships, and field conventions |
+| 🧩 [UML Diagram](./docs/uml-diagram.png) | Full UML diagram covering modules, services, controllers, and entities |
+
+> Interactive API docs are also available at `http://localhost:3000/api` when the server is running.
 
 ---
 
-## 🚀 Getting Started
+## 📬 API Quick Reference
 
-### 1. Install Dependencies
-
-```bash
-npm install
-```
-
-### 2. Run Development Server
-
-```bash
-npm run start:dev
-```
-
-### 3. API Documentation (Swagger)
-
-เมื่อรันโปรเจคแล้ว สามารถเข้าดู Swagger ได้ที่:
-
-```text
-http://localhost:3000/api
-```
-
----
-
-## 🧩 Model Sets
-
-แต่ละกลุ่มต้องเลือก **Model Set 1 ชุด** จาก 10 ชุดที่มีให้
-
-**วิธีการเลือก Model Set:**
-1. นำ Student ID ของสมาชิกทุกคนในกลุ่มมารวมกัน (`sumStudentId`)
-2. นำผลรวม mod 10
-3. ค่าที่ได้ (0-9) จะเป็น Model Set ID ที่กลุ่มได้รับ
-
-**ตัวอย่าง:** 
-- สมาชิก 3 คน มี Student ID: 64123456, 64123457, 64123458
-- `sumStudentId` = 64123456 + 64123457 + 64123458 = 192370371
-- 192370371 mod 10 = 1 → **Model Set ID: "1"** (Blog / Content Platform)
-
-> 📌 **เมื่อได้ Model Set แล้ว ห้ามเปลี่ยน** เว้นแต่ได้รับอนุญาตจากอาจารย์
-
-**หลังจากเลือก Model Set แล้ว ให้บันทึกใน `package.json`:**
-```json
-{
-  "project": {
-    "model": {
-      "id": "1",
-      "name": "Blog / Content Platform"
-    },
-    "sumStudentId": 192370371
-  }
-}
-```
-
-**รายละเอียด Model Sets ทั้งหมด:** → [`subjects/models.md`](subjects/models.md)
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/auth/register` | Register a new user |
+| `POST` | `/auth/login` | Log in |
+| `GET` | `/users` | List all users |
+| `GET` | `/users/:id` | Get user by ID |
+| `POST` | `/users` | Create user |
+| `PATCH` | `/users/:id` | Update user |
+| `DELETE` | `/users/:id` | Delete user |
+| `GET` | `/posts` | List all posts |
+| `GET` | `/posts/:id` | Get post by ID |
+| `POST` | `/posts` | Create post |
+| `PUT` | `/posts/:id` | Replace post |
+| `PATCH` | `/posts/:id` | Update post |
+| `DELETE` | `/posts/:id` | Delete post |
+| `GET` | `/comments/post/:postId` | Get comments for a post |
+| `POST` | `/comments` | Create comment *(registered users only)* |
+| `PUT` | `/comments/:id` | Replace comment |
+| `PATCH` | `/comments/:id` | Update comment |
+| `DELETE` | `/comments/:id` | Delete comment |
 
 ---
 
-## 📐 Project Requirements (Summary)
-
-### Data Model
-* ต้องเลือกใช้ **Model Set 1 ชุด** จาก 10 ชุดที่มีให้ (ดูรายละเอียดใน [`subjects/models.md`](subjects/models.md))
-* แต่ละ Model Set มี **Core Data Model 2 Models**
-* ต้องบันทึก Model Set ที่เลือกไว้ใน `package.json` (key `project`)
-* ใช้ TypeScript data type ให้ครบถ้วน
-* ต้องมีการใช้งาน **Enum อย่างน้อย 1 จุด**
-* ❌ **ห้ามใช้ `any` type ในทุกกรณี**
-
-### API Design
-* ทุก Model ต้องรองรับ **CRUD Operation ครบถ้วน**
-* ใช้ HTTP Method ให้ถูกต้องตามหลัก REST API:
-  * `GET /resources` - ดึงข้อมูลทั้งหมด
-  * `GET /resources/{id}` - ดึงข้อมูลตาม ID
-  * `POST /resources` - สร้างข้อมูลใหม่
-  * `PUT /resources/{id}` - อัปเดตข้อมูลทั้งหมด
-  * `PATCH /resources/{id}` - อัปเดตข้อมูลบางส่วน
-  * `DELETE /resources/{id}` - ลบข้อมูล
-* URL path ต้องตั้งชื่อให้สื่อความหมาย
-
-### Standard Response Format
-
-ทุก API ต้องใช้ Response Format แบบเดียวกัน:
-
-```typescript
-interface ApiResponse<T> {
-  success: boolean;
-  message: string;
-  data: T | null;
-}
-```
-
-### Validation & Error Handling
-* ทุก API ต้องมีการ **validate ข้อมูล**
-* ใช้ **HTTP Status Code** ที่เหมาะสม:
-  * `200` - OK (GET, PUT, PATCH สำเร็จ)
-  * `201` - Created (POST สำเร็จ)
-  * `400` - Bad Request (Validation error)
-  * `403` - Forbidden (ไม่มีสิทธิ์)
-  * `404` - Not Found (ไม่พบข้อมูล)
-  * `500` - Internal Server Error (Server error)
-* ⚠️ **ไม่ควรเกิด Error 500 จาก logic ที่สามารถป้องกันได้**
-* หากพบ Error 500 มากกว่า 5 จุด อาจมีผลต่อการให้คะแนน
-
----
-
-## 📄 Documentation
-
-เอกสารรายละเอียดของโจทย์และข้อกำหนดทั้งหมดถูกจัดเก็บไว้ในโฟลเดอร์ `subjects/`
-
-### เอกสารโจทย์ (Project Specification)
-
-* 📘 **Project Requirement** — ขอบเขตและข้อกำหนดของโปรเจค
-  → [`subjects/requirement.md`](subjects/requirement.md)
-* 🧩 **Model Sets** — รายละเอียด Model Sets ทั้ง 10 ชุด
-  → [`subjects/models.md`](subjects/models.md)
-* 📦 **Submission Guideline** — รูปแบบและขั้นตอนการส่งงาน
-  → [`subjects/submission.md`](subjects/submission.md)
-* 🧮 **Evaluation Criteria** — เกณฑ์การให้คะแนนและการประเมินผล
-  → [`subjects/evaluation.md`](subjects/evaluation.md)
-
-### เอกสารทางเทคนิค (ต้องจัดทำ)
-
-* 🔌 **API Specification (Swagger)** — เอกสาร API ทุก Endpoint
-* 🧱 **Data Model Documentation** — เอกสารอธิบาย Data Model
-* 📊 **UML Diagram** — แผนภาพ UML ของ Data Model
-
----
-
-## 👥 Team & Contributors
-
-รายชื่อสมาชิกในกลุ่มต้องถูกระบุไว้ใน key `contributors` ภายในไฟล์ `package.json` โดยมีรูปแบบดังนี้:
-
-```json
-"contributors": [
-  {
-    "fullname": "ชื่อ-นามสกุล",
-    "username": "github-username",
-    "studentId": "รหัสนักศึกษา"
-  }
-]
-```
-
----
-
-## 🤖 AI Usage Policy
-
-* อนุญาตให้ใช้ AI (เช่น ChatGPT) ช่วยในการพัฒนาโปรเจค
-* นักศึกษาต้องสามารถอธิบายโค้ดและแนวคิดของระบบได้ด้วยตนเอง
-* หากไม่สามารถอธิบายได้ อาจมีผลต่อการประเมินคะแนน
-
----
-
-## ✅ Submission
-
-* ส่งงานเป็น **GitHub Repository URL** ในนามของ **Team Lead**
-* Repository ต้องสามารถเข้าถึงได้
-
----
-
-## 📝 Important Notes
-
-* โค้ดต้องอ่านง่าย เป็นระบบ และดูแลรักษาได้
-* ทุก request และ response ต้องกำหนด interface แบบ narrow type
-* ใช้ TypeScript strict mode (`strict: true` ใน tsconfig.json)
-* ESLint จะตรวจสอบและป้องกันการใช้ `any` type อัตโนมัติ
-
----
-
-📌 *This repository is intended for educational purposes only.*
+<div align="center">
+  <sub>Blog API v1.0.0 · Built with NestJS & TypeScript</sub>
+</div>
