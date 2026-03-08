@@ -10,6 +10,10 @@ export class CreatePostDto {
   @IsNotEmpty()
   content!: string;
 
+  @IsString() // *** เพิ่มฟิลด์ระบุ ID ผู้เขียน
+  @IsNotEmpty()
+  authorId!: string;
+
   @IsEnum(PostStatus)
   status!: PostStatus;
 }
