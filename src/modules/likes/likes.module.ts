@@ -1,11 +1,14 @@
 import { Module } from '@nestjs/common';
 import { LikesService } from './likes.service';
 import { LikesController } from './likes.controller'
+import { PostsModule } from '../posts/posts.module'
+
 /**
  * Module สำหรับ likes
  */
 
 @Module({
+  imports: [PostsModule],
   controllers:[LikesController],
   providers: [LikesService],
   exports: [LikesService],

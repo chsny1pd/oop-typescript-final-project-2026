@@ -1,60 +1,3 @@
-<<<<<<< HEAD
-import { Controller, Get, Post, Body, Param, NotFoundException, InternalServerErrorException } from '@nestjs/common';
-import { UsersService } from './users.service';
-import { User } from './interfaces/user.interface';
-import { ApiResponse } from '../../common/interfaces/api-response.interface';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
-
-@ApiTags('Users') // จัดกลุ่มสำหรับ Swagger
-@Controller('users')
-export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
-
-@Post()
-  @ApiOperation({ summary: 'สร้างผู้ใช้งานใหม่' })
-  create(@Body() user: User): ApiResponse<User> {
-    try {
-      const newUser = this.usersService.create(user);
-      return {
-        success: true,
-        message: 'สร้างผู้ใช้งานสำเร็จ',
-        data: newUser,
-      };
-    } catch (error) {
-      // ป้องกัน Error 500 ดิบๆ โดยส่งข้อความที่เราคุมเอง
-      throw new InternalServerErrorException('ไม่สามารถสร้างผู้ใช้งานได้ในขณะนี้');
-    }
-  }
-
-  @Get()
-  @ApiOperation({ summary: 'ดึงข้อมูลผู้ใช้งานทั้งหมด' })
-  findAll(): ApiResponse<User[]> {
-    const users = this.usersService.findAll();
-    return {
-      success: true,
-      message: 'ดึงข้อมูลผู้ใช้งานทั้งหมดสำเร็จ',
-      data: users,
-    };
-  }
-
-  @Get(':username')
-  @ApiOperation({ summary: 'ค้นหาผู้ใช้งานด้วย username' })
-  findByUsername(@Param('username') username: string): ApiResponse<User> {
-    const user = this.usersService.findByUsername(username);
-
-    // ดักจับกรณีไม่พบข้อมูล เพื่อส่ง HTTP 404 ตามเกณฑ์
-    if (!user) {
-      throw new NotFoundException(ไม่พบผู้ใช้งานชื่อ ${username});
-    }
-
-    return {
-      success: true,
-      message: 'ค้นหาผู้ใช้งานสำเร็จ',
-      data: user,
-    };
-  }
-}
-=======
 import {
   Controller,
   Get,
@@ -95,7 +38,7 @@ export class UsersController {
   findOne(
     @Param('id') id: string
   ) {
-    return this.usersService.findOne(Number(id));
+    return this.usersService.findOne(id);
   }
 
   /**
@@ -105,7 +48,7 @@ export class UsersController {
   create(
     @Body() dto: CreateUserDto
   ) {
-    return this.usersService.create(dto);
+    return this.usersService.registerUser(dto);
   }
 
   /**
@@ -116,7 +59,7 @@ export class UsersController {
     @Param('id') id: string,
     @Body() dto: UpdateUserDto
   ) {
-    return this.usersService.update(Number(id), dto);
+    return this.usersService.update(id, dto);
   }
 
   /**
@@ -126,8 +69,7 @@ export class UsersController {
   remove(
     @Param('id') id: string
   ) {
-    return this.usersService.remove(Number(id));
+    return this.usersService.remove(id);
   }
 
 }
->>>>>>> 05b004a (update likes auth user - controller and dto)

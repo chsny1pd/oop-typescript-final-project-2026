@@ -5,7 +5,7 @@
 export class UserResponseDto {
 
   /** id ของ user */
-  id!: number;
+  id!: string;
 
   /** username */
   username!: string;

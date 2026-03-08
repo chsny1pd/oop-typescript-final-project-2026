@@ -1,11 +1,13 @@
-import { IsString, IsEnum, IsOptional } from 'class-validator';
+import { IsString, IsEnum, IsOptional,IsNotEmpty } from 'class-validator';
 import { PostStatus } from '../interfaces/post.interface';
 
 export class CreatePostDto {
   @IsString()
+  @IsNotEmpty()
   title!: string;
 
   @IsString()
+  @IsNotEmpty()
   content!: string;
 
   @IsEnum(PostStatus)

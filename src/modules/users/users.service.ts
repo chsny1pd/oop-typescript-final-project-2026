@@ -26,6 +26,11 @@ export class UsersService {
     };
   }
 
+  // ใช้ findByUsername เพื่อให้ AuthService ใช้งานได้
+  findByUsername(username: string): User | undefined {
+    return this.users.find(u => u.username === username);
+  }
+
   /**
    * GET ALL
    */
@@ -36,7 +41,7 @@ export class UsersService {
   /**
    * GET ONE
    */
-  findOne(id: number): UserResponseDto {
+  findOne(id: string): UserResponseDto {
 
     const user = this.users.find(u => u.id === id);
 
@@ -48,26 +53,28 @@ export class UsersService {
   }
 
   /**
-   * CREATE
+   * CREATE(ไว้เก็บ,บันทึกค่า)
    */
-  create(dto: CreateUserDto): UserResponseDto {
-
-    const newUser: User = {
-      id: Date.now(),
-      username: dto.username,
-      password: dto.password,
-      createdAt: new Date().toISOString()
-    };
-
-    this.users.push(newUser);
-
-    return this.toResponse(newUser);
+  create(user: User): User {
+    this.users.push(user);
+    return user;
   }
+
+  // ฟังก์ชันใหม่ (เพื่อให้ Controller และ Auth เรียกใช้ง่ายๆ)
+  registerUser(dto: CreateUserDto): User {
+  const newUser: User = {
+    id: Date.now().toString(), // สร้าง ID เป็น string ที่นี่
+    ...dto,
+    createdAt: new Date().toISOString(), // บันทึกวันที่
+  };
+  
+  return this.create(newUser); // ส่งไปบันทึกผ่านฟังก์ชันหลัก
+}
 
   /**
    * UPDATE
    */
-  update(id: number, dto: UpdateUserDto): UserResponseDto {
+  update(id: string, dto: UpdateUserDto): UserResponseDto {
 
     const user = this.users.find(u => u.id === id);
 
@@ -84,7 +91,7 @@ export class UsersService {
   /**
    * DELETE
    */
-  remove(id: number): { message: string } {
+  remove(id: string): { message: string } {
 
     const index = this.users.findIndex(u => u.id === id);
 
