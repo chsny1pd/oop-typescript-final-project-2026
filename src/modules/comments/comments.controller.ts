@@ -5,7 +5,8 @@ import {
   Body,
   Param,
   Delete,
-  Patch
+  Patch,
+  Put
 } from '@nestjs/common';
 
 import { CommentsService } from './comments.service';
@@ -44,6 +45,19 @@ export class CommentsController {
   create(@Body() dto: CreateCommentDto) {
 
     return this.commentsService.create(dto);
+
+  }
+
+   /**
+   * PUT แก้ comment (replace ทั้งหมด)
+   */
+  @Put(':id')
+  replace(
+    @Param('id') id: string,
+    @Body() dto: UpdateCommentDto
+  ) {
+
+    return this.commentsService.update(id, dto);
 
   }
 
